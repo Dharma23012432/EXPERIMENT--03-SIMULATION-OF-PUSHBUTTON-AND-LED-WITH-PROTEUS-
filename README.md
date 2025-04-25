@@ -73,43 +73,63 @@ We are now at the last part of step by step guide on how to simulate STM32 proje
 ## STM 32 CUBE PROGRAM :
 ```
 #include "main.h"
-#include<stdbool.h>
-void push_button();
-bool button_status;
+#include "stdbool.h"
+bool button;
+void led_blink();
+
+
+
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
+
+
 int main(void)
 {
-    HAL_Init();
-    SystemClock_Config();
-    MX_GPIO_Init();
- while (1)
-  {
-	  push_button();
-  }
-  }
+  
+  HAL_Init();
 
-void push_button()
-{
-button_status=HAL_GPIO_ReadPin(GPIOC,GPIO_PIN_13);
-if (button_status==0)
-{
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
+  SystemClock_Config();
+
+ 
+  MX_GPIO_Init();
+
+  while (1)
+  {
+    
+	led_blink();
+   
+  }
+  
 }
-else
+void led_blink()
 {
-HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
+	button=HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0);
+	if(button==0)
+	{
+		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
+		HAL_Delay(1000);
+		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
+		HAL_Delay(1000);
+	}
+	else
+	{
+		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_RESET);
+		HAL_Delay(1000);
+	}
 }
-}
+
 
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+ 
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -118,6 +138,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+ 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
@@ -131,34 +152,46 @@ void SystemClock_Config(void)
   }
 }
 
+
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  __HAL_RCC_GPIOC_CLK_ENABLE();
+
+ 
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
+
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = GPIO_PIN_0;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  
   GPIO_InitStruct.Pin = GPIO_PIN_5;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
 }
+
+
 void Error_Handler(void)
 {
+  
   __disable_irq();
   while (1)
   {
   }
+  
 }
-#ifdef  USE_FULL_ASSERT
+
 void assert_failed(uint8_t *file, uint32_t line)
 {
+ ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line)
 }
-#endif
 ```
 ## Output screen shots of proteus  :
 ![image](https://github.com/user-attachments/assets/4c90afa6-2a88-44ef-95ac-08e53f8add81)
